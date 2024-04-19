@@ -5,6 +5,7 @@ import {
     LiveKitRoom,
     VideoConference,
 } from '@livekit/components-react';
+import '@livekit/components-styles';
 import { useUser } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 
@@ -23,13 +24,17 @@ export default function MediaRoom({ chatId, video, audio }: MediaRoomProps) {
         if (!user?.firstName || !user?.lastName) return;
         const name = `${user.firstName} ${user.lastName}`;
 
-        const fetchToken = async () => {
-            const res = await fetch(`/api/livekit?room=${chatId}&username=${name}`);
-            const data = await res.json();
-            setToken(data.token);
-        };
+        (async () => {
+            try {
+                const resp = await fetch(`/api/livekit?room=${chatId}&username=${name}`);
+                const data = await resp.json();
+                setToken(data.token);
+            } catch (error) {
+                console.log(error);
 
-        fetchToken();
+            }
+        })();
+
     }, [user?.firstName, user?.lastName, chatId]);
 
     if (token === "") {
@@ -56,3 +61,4 @@ export default function MediaRoom({ chatId, video, audio }: MediaRoomProps) {
         </LiveKitRoom>
     );
 }
+
